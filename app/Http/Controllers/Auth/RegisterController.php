@@ -3,22 +3,24 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegistrationRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class RegisterController extends Controller
 {
-    public function showRegisterPage(Request $request)
+    public function showRegisterPage() : View
     {
-        return view('auth.register');
+        return view('auth.registration');
     }
 
-    public function registerUser(Request $request)
+    public function registerUser(RegistrationRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string|min:8'
-        ]);
+        $validatedData = $request->validated();
+        $user = User::query()->create($validatedData);
+        auth()->login($user);
+
+        return redirect('/')->with('success', 'Successfully logged in');
     }
 }
