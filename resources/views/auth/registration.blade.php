@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
             Or
-            <a href="{{ route('login') }}" class="font-medium text-teal-600 hover:text-teal-500 transition ease-in-out duration-150">
+            <a href="{{ route('auth.login') }}" class="font-medium text-teal-600 hover:text-teal-500 transition ease-in-out duration-150">
                 sign in to your existing account
             </a>
         </p>
