@@ -1,3 +1,4 @@
+@include('layouts.layout')
 <div>
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,10 +14,10 @@
                 <div class="flex items-center space-x-2 sm:space-x-4">
 
                     @guest
-                        <a href="#" class="text-sm font-medium text-gray-500 hover:text-teal-600 px-3 py-2 rounded-md transition duration-150 ease-in-out">
+                        <a href="{{route('auth.login')}}" class="text-sm font-medium text-gray-500 hover:text-teal-600 px-3 py-2 rounded-md transition duration-150 ease-in-out">
                             Log in
                         </a>
-                        <a href="#" class="text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">
+                        <a href="{{route('auth.registration')}}" class="text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">
                             Sign up
                         </a>
                     @endguest
@@ -36,12 +37,19 @@
                             <span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                         </button>
 
-                        <div class="ml-2 pl-4 border-l border-gray-200">
+                        <div class="flex items-center gap-4 ml-2 pl-4 border-l border-gray-200">
                             <button class="flex items-center focus:outline-none">
                                 <div class="w-8 h-8 rounded-full bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center text-sm font-bold">
                                     {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                                 </div>
                             </button>
+
+                            <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-sm font-medium text-gray-500 hover:text-teal-600 transition duration-150 ease-in-out bg-transparent border-none p-0 cursor-pointer">
+                                    Log Out
+                                </button>
+                            </form>
                         </div>
                     @endauth
 
