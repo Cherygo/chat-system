@@ -29,4 +29,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Chat::class, 'chats_user')
+            ->withPivot('last_read_message_id')
+            ->withTimestamps();
+    }
 }
