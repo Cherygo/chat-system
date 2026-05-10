@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Chat\ChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,4 +22,12 @@ Route::group(['prefix' => 'auth'], function () {
     ->middleware('guest');
 
 Route::post('/logout', LogoutController::class)->name('auth.logout')
-->middleware('auth');
+    ->middleware('auth');
+
+//CHATS
+Route::group(['prefix' => 'chat'], function () {
+   Route::get('/index', [ChatController::class, 'index'])->name('chat.index');
+   Route::get('/{chat}', [ChatController::class, 'show'])->name('chat.show');
+   Route::post('/{chat}', [ChatController::class, 'store'])->name('chat.store');
+})
+    ->middleware('auth');
