@@ -36,7 +36,11 @@
 
                 <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white shadow-sm z-10">
                     <h3 class="font-bold text-gray-900 text-lg">
-                        {{ $chat->is_group ? $chat->name : '1-on-1 Chat' }}
+                        @if($chat->is_group)
+                            {{ $chat->name }}
+                        @else
+                            {{$chat->users->where('id', '!=', auth()->id())->first()->username ?? 'Unknown' }}
+                        @endif
                     </h3>
                     <span class="text-sm text-gray-500">{{ $chat->users->count() }} members</span>
                 </div>
