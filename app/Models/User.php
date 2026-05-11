@@ -30,7 +30,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function conversations()
+    public function chats()
     {
         return $this->belongsToMany(Chat::class, 'chats_user')
             ->withPivot('last_read_message_id')
