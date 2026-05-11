@@ -28,4 +28,7 @@ Route::prefix('chat')->middleware('auth')->group(function () {
    Route::get('/index', [ChatController::class, 'index'])->name('chat.index');
    Route::get('/{chat}', [ChatController::class, 'show'])->name('chat.show');
    Route::post('/{chat}', [ChatController::class, 'store'])->name('chat.store');
+
+   Route::get('/api/search', [ChatController::class, 'search'])->name('chat.search');
+   Route::post('/start/{user}', [ChatController::class, 'startChat'])->name('chat.start');
 });
