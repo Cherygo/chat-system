@@ -14,10 +14,10 @@
                 <div class="flex items-center space-x-2 sm:space-x-4">
 
                     @guest
-                        <a href="{{route('auth.login')}}" class="text-sm font-medium text-gray-500 hover:text-teal-600 px-3 py-2 rounded-md transition duration-150 ease-in-out">
+                        <a href="{{route('login')}}" class="text-sm font-medium text-gray-500 hover:text-teal-600 px-3 py-2 rounded-md transition duration-150 ease-in-out">
                             Log in
                         </a>
-                        <a href="{{route('auth.registration')}}" class="text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">
+                        <a href="{{route('registration')}}" class="text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-md shadow-sm transition duration-150 ease-in-out">
                             Sign up
                         </a>
                     @endguest
@@ -44,7 +44,7 @@
                                 </div>
                             </button>
 
-                            <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf
                                 <button type="submit" class="text-sm font-medium text-gray-500 hover:text-teal-600 transition duration-150 ease-in-out bg-transparent border-none p-0 cursor-pointer">
                                     Log Out

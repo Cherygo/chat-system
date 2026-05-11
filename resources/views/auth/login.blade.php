@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600">
             Or
-            <a href="{{ route('auth.registration') }}" class="font-medium text-teal-600 hover:text-teal-500 transition ease-in-out duration-150">
+            <a href="{{ route('registration') }}" class="font-medium text-teal-600 hover:text-teal-500 transition ease-in-out duration-150">
                 create a new account
             </a>
         </p>
@@ -17,7 +17,7 @@
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
 
-            <form class="space-y-6" action="{{ route('auth.login.user') }}" method="POST">
+            <form class="space-y-6" action="{{ route('login.user') }}" method="POST">
                 @csrf
 
                 <div>
