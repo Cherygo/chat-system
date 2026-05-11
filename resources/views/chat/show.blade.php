@@ -67,28 +67,88 @@
     </div>
 
 
+
 <script>
-{{-- scroll to end of a chat--}}
-        const messagesContainer = document.getElementById('chat-messages');
-        if(messagesContainer) {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-
-{{--disable multiple message submissions in one page refresh--}}
-    const messageContainer = document.getElementById('chat-messages');
-    if(messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
+    {{-- scroll to end of a chat --}}
+    const messagesContainer = document.getElementById('chat-messages');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
+</script>
 
+<script>
+    {{-- disable multiple message submissions --}}
     const chatForm = document.getElementById('chat-form');
     const submitBtn = document.getElementById('submit-btn');
 
-    if(chatForm) {
+    if (chatForm && submitBtn) {
         chatForm.addEventListener('submit', function() {
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
         });
+    }
+</script>
+
+<script type="module">
+    console.log('Script is alive and running!');
+
+    const msgContainer = document.getElementById('chat-messages');
+
+    if (!msgContainer) {
+        console.error('CRITICAL: Could not find the "chat-messages" container in your HTML!');
+    } else {
+        @if(isset($chat))
+        const currentUserId = {{ auth()->id() }};
+        const chatId = {{ $chat->id }};
+
+        setTimeout(() => {
+            if (typeof window.Echo === 'undefined') {
+                console.error('Echo missing. Vite did not load it correctly.');
+                return;
+            }
+
+            console.log(`Echo found. Private chat: ${chatId}...`);
+
+            window.Echo.private(`chat.${chatId}`)
+                .listen('.message.sent', (e) => {
+                    console.log('WebSocket caught a msg', e);
+
+                    if(e.message.user_id === currentUserId){
+                       console.log('ignored message from current user');
+                        return;
+                    }
+
+                    try {
+                        const senderInitial = e.message.sender.username.charAt(0).toUpperCase();
+                        const senderName = e.message.sender.username;
+                        const content = e.message.content;
+                        const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+                        const incomingBubble = `
+                                <div class="flex justify-start mb-4">
+                                    <div class="flex items-end gap-2 max-w-md">
+                                        <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-bold shrink-0">
+                                            ${senderInitial}
+                                        </div>
+                                        <div class="bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-2xl rounded-tl-sm shadow-sm">
+                                            ${ @json($chat->is_group) ? `<span class="text-[11px] font-bold text-teal-600 block mb-1">${senderName}</span>` : '' }
+                                            <p class="text-sm">${content}</p>
+                                            <span class="text-[10px] text-gray-400 mt-1 block">${time}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                        msgContainer.insertAdjacentHTML('beforeend', incomingBubble);
+                        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+                        console.log('Bubble drawn successfully.');
+                    } catch (error) {
+                        console.error('Failed bubble. Error:', error);
+                    }
+                });
+        }, 500);
+        @endif
     }
 </script>
 
