@@ -11,7 +11,7 @@
                         @if($chat->is_group)
                             {{ $chat->name }}
                         @else
-                            {{$chat->users->where('id', '!=', auth()->id())->first()->username ?? 'Unknown' }}
+                            {{$chat->users->where('id', '!=', auth()->id())->first()->username ?? 'System' }}
                         @endif
                     </h3>
                     <span class="text-sm text-gray-500">{{ $chat->users->count() }} members</span>
@@ -66,8 +66,6 @@
         </div>
     </div>
 
-
-
 <script>
     {{-- scroll to end of a chat --}}
     const messagesContainer = document.getElementById('chat-messages');
@@ -90,6 +88,7 @@
 </script>
 
 <script type="module">
+    {{-- Auto render messages for another user --}}
     console.log('Script is alive and running!');
 
     const msgContainer = document.getElementById('chat-messages');
@@ -114,7 +113,7 @@
                     console.log('WebSocket caught a msg', e);
 
                     if(e.message.user_id === currentUserId){
-                       console.log('ignored message from current user');
+                        console.log('ignored message from current user');
                         return;
                     }
 
@@ -151,5 +150,4 @@
         @endif
     }
 </script>
-
 @include('components.footer')
