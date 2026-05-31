@@ -55,12 +55,12 @@
     <div class="flex-1 overflow-y-auto">
         @forelse($chats as $chat)
             <a href="{{ route('chat.show', $chat->id) }}" class="block p-4 border-b border-gray-100 hover:bg-gray-100 transition duration-150">
-                <div class="flex justify-between items-center mb-1">
+                <div class="flex justify-between items-center mb-1" id="chat-list">
                             <span class="font-semibold text-gray-900">
                                 @if($chat->is_group)
                                     {{ $chat->name }}
                                 @else
-                                    {{$chat->users->where('id', '!=', auth()->id())->first()->username ?? 'Unknown' }}
+                                    {{$chat->users->where('id', '!=', auth()->id())->first()->username ?? 'System' }}
                                 @endif
                             </span>
                     @if($chat->lastMessage)
@@ -80,71 +80,3 @@
         @endforelse
     </div>
 </div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('groupModal');
-        const openBtn = document.getElementById('openGroupModal');
-        const closeBtn = document.getElementById('closeGroupModal');
-
-        openBtn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-        });
-
-        closeBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.add('hidden');
-            }
-        });
-    });
-</script>
-
-<script>
-    const searchInput = document.getElementById('user-search');
-    const resultsBox = document.getElementById('search-results');
-
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            let query = this.value;
-
-            if(query.length < 2) {
-                resultsBox.classList.add('hidden');
-                return;
-            }
-
-            fetch(`/chat/api/search?query=${query}`)
-                .then(response => response.json())
-                .then(users => {
-                    resultsBox.innerHTML = '';
-
-                    if(users.length === 0) {
-                        resultsBox.innerHTML = '<div class="p-3 text-sm text-gray-500 text-center">No users found.</div>';
-                    } else {
-                        users.forEach(user => {
-                            resultsBox.innerHTML += `
-                                <form action="/chat/start/${user.id}" method="POST" class="m-0 border-b border-gray-100 last:border-0">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition duration-150 font-medium cursor-pointer">
-                                        ${user.username}
-                                    </button>
-                                </form>
-                            `;
-                        });
-                    }
-                    resultsBox.classList.remove('hidden');
-                });
-        });
-
-        // hide dropdown when clicking outside of it
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.relative-search-container')) {
-                resultsBox.classList.add('hidden');
-            }
-        });
-    }
-</script>
