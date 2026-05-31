@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Events\ChatEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
@@ -101,6 +102,7 @@ class ChatController extends Controller
         $userIds = array_merge($validated['user_ids'], [auth()->id()]);
 
         $chat->users()->attach($userIds);
+        event(new ChatEvent($chat));
 
         return redirect()->route('chat.show', $chat->id);
     }

@@ -16,3 +16,7 @@ Broadcast::channel('chat.{chatId}', function (User $user, $chatId) {
 
     return $chat->users->contains($user->id);
 });
+
+Broadcast::channel('user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
