@@ -14,7 +14,8 @@ class ChatController extends Controller
     {
         $user = auth()->user();
         $chats = $user?->chats()->with(['lastMessage', 'users'])->get();
-        return view('chat.index', compact('chats'));
+        $users = User::where('id', '!=', auth()->id())->get();
+        return view('chat.index', compact('chats', 'users'));
     }
 
     public function show($id)
@@ -24,7 +25,8 @@ class ChatController extends Controller
             abort(403, 'Unauthorized access to chatroom');
         }
         $chats = auth()->user()->chats()->with(['lastMessage', 'users'])->get();
-        return view('chat.show', compact('chat','chats'));
+        $users = User::where('id', '!=', auth()->id())->get();
+        return view('chat.show', compact('chat','chats', 'users'));
     }
 
     public function store(Request $request, $chatId)
@@ -80,6 +82,25 @@ class ChatController extends Controller
 
             $chat->users()->attach([auth()->id(), $user->id]);
         }
+
+        return redirect()->route('chat.show', $chat->id);
+    }
+
+    public function storeGroup(Request $request)
+    {
+//        dd($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+        $chat = Chat::create([
+            'name' => $validated['name'],
+            'is_group' => true,
+        ]);
+        $userIds = array_merge($validated['user_ids'], [auth()->id()]);
+
+        $chat->users()->attach($userIds);
 
         return redirect()->route('chat.show', $chat->id);
     }
