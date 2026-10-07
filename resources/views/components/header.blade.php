@@ -1,4 +1,3 @@
-@include('layouts.layout')
 <div>
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,11 +30,9 @@
                         </a>
 
                         <div class="flex items-center gap-4 ml-2 pl-4 border-l border-gray-200">
-                            <button class="flex items-center focus:outline-none">
-                                <div class="w-8 h-8 rounded-full bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center text-sm font-bold">
-                                    {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
-                                </div>
-                            </button>
+                            <span class="w-8 h-8 rounded-full bg-teal-100 border border-teal-200 text-teal-700 flex items-center justify-center text-sm font-bold" title="{{ auth()->user()->username }}">
+                                {{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr(auth()->user()->username, 0, 1)) }}
+                            </span>
 
                             <form method="POST" action="{{ route('logout') }}" class="inline">
                                 @csrf

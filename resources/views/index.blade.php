@@ -1,7 +1,6 @@
-<body class="bg-gray-50 font-sans antialiased text-gray-900 selection:bg-teal-500 selection:text-white flex flex-col min-h-screen">
-@include('components.header')
+@extends('layouts.layout')
 
-<main class="flex-grow">
+@section('content')
 
     <section class="relative bg-white overflow-hidden border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
@@ -17,12 +16,12 @@
                 <div class="mt-10 sm:flex sm:justify-center gap-4">
                     @guest
                         <div class="rounded-md shadow">
-                            <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition duration-150 md:py-4 md:text-lg md:px-10">
+                            <a href="{{ route('registration') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition duration-150 md:py-4 md:text-lg md:px-10">
                                 Get Started for Free
                             </a>
                         </div>
                         <div class="mt-3 sm:mt-0 sm:ml-3">
-                            <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-teal-700 bg-white hover:bg-gray-50 transition duration-150 md:py-4 md:text-lg md:px-10">
+                            <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-teal-700 bg-white hover:bg-gray-50 transition duration-150 md:py-4 md:text-lg md:px-10">
                                 Log In
                             </a>
                         </div>
@@ -30,7 +29,7 @@
 
                     @auth
                         <div class="rounded-md shadow">
-                            <a href="/messages" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition duration-150 md:py-4 md:text-lg md:px-10 shadow-lg shadow-teal-500/30">
+                            <a href="{{ route('chat.index') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 transition duration-150 md:py-4 md:text-lg md:px-10 shadow-lg shadow-teal-500/30">
                                 Open Your Chats
                             </a>
                         </div>
@@ -82,21 +81,4 @@
             </div>
         </div>
     </section>
-</main>
-
-<footer class="bg-white border-t border-gray-200 mt-auto py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-        <div class="flex items-center gap-2 mb-4 md:mb-0">
-            <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-            </svg>
-            <span class="text-lg font-bold text-gray-900">Cherygo chat</span>
-        </div>
-        <p class="text-gray-400 text-sm">
-            &copy; {{ date('Y') }} Cherygo chat. No rights reserved.
-        </p>
-    </div>
-</footer>
-
-</body>
-</html>
+@endsection

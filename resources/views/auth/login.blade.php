@@ -1,4 +1,6 @@
-@include('components.header')
+@extends('layouts.layout')
+
+@section('content')
 <div class="h-150 bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
 
@@ -27,11 +29,11 @@
 
                     </label>
                     <div class="mt-1">
-                        <input id="login" name="login" type="text" value="{{ old('login') }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('login') border-red-500 @enderror">
+                        <input id="login" name="login" required aria-invalid="{{ $errors->has('login') ? 'true' : 'false' }}" @error('login') aria-describedby="login-error" @enderror type="text" value="{{ old('login') }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('login') border-red-500 @enderror">
 
                     </div>
                     @error('login')
-                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                    <p id="login-error" class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
                     @enderror
 
                 </div>
@@ -41,10 +43,10 @@
                         Password
                     </label>
                     <div class="mt-1">
-                        <input id="password" name="password" type="password" autocomplete="current-password" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('password') border-red-500 @enderror">
+                        <input id="password" name="password" required aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" @error('password') aria-describedby="password-error" @enderror type="password" autocomplete="current-password" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('password') border-red-500 @enderror">
                     </div>
                     @error('password')
-                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                    <p id="password-error" class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -54,12 +56,6 @@
                         <label for="remember" class="ml-2 block text-sm text-gray-900">
                             Remember me
                         </label>
-                    </div>
-
-                    <div class="text-sm">
-                        <a href="" class="font-medium text-teal-600 hover:text-teal-500 transition duration-150 ease-in-out">
-                            Forgot your password?
-                        </a>
                     </div>
                 </div>
 
@@ -73,4 +69,4 @@
     </div>
 </div>
 
-@include('components.footer')
+@endsection

@@ -1,4 +1,6 @@
-@include('components.header')
+@extends('layouts.layout')
+
+@section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm flex h-[75vh] overflow-hidden">
 
@@ -150,4 +152,4 @@
         @endif
     }
 </script>
-@include('components.footer')
+@endsection
