@@ -83,4 +83,12 @@ class AuthenticationTest extends TestCase
         $this->assertDatabaseCount('users', 0);
         $this->assertGuest();
     }
+
+    public function test_invalid_login_input_renders_validation_errors_without_crashing(): void
+    {
+        $this->from(route('login'))->post(route('login.user'), [
+            'login' => ['invalid'], 'password' => 'password',
+        ])->assertRedirect(route('login'))->assertSessionHasErrors('login');
+        $this->get(route('login'))->assertOk();
+    }
 }

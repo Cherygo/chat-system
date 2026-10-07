@@ -24,7 +24,7 @@
                         Username
                     </label>
                     <div class="mt-1">
-                        <input id="username" name="username" required aria-invalid="{{ $errors->has('username') ? 'true' : 'false' }}" @error('username') aria-describedby="username-error" @enderror type="text" value="{{ old('username') }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('username') border-red-500 @enderror">
+                        <input id="username" name="username" required aria-invalid="{{ $errors->has('username') ? 'true' : 'false' }}" @error('username') aria-describedby="username-error" @enderror type="text" value="{{ is_string(old('username')) ? old('username') : '' }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('username') border-red-500 @enderror">
                     </div>
                     @error('username')
                         <p id="username-error" class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -36,7 +36,7 @@
                         Email address
                     </label>
                     <div class="mt-1">
-                        <input id="email" name="email" required aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" @error('email') aria-describedby="email-error" @enderror type="email" value="{{ old('email') }}" autocomplete="email" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('email') border-red-500 @enderror">
+                        <input id="email" name="email" required aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" @error('email') aria-describedby="email-error" @enderror type="email" value="{{ is_string(old('email')) ? old('email') : '' }}" autocomplete="email" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('email') border-red-500 @enderror">
                     </div>
                     @error('email')
                         <p id="email-error" class="mt-2 text-sm text-red-600">{{ $message }}</p>

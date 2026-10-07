@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('content')
-<div class="h-150 bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
+<div class="min-h-150 bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
 
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -29,7 +29,7 @@
 
                     </label>
                     <div class="mt-1">
-                        <input id="login" name="login" required aria-invalid="{{ $errors->has('login') ? 'true' : 'false' }}" @error('login') aria-describedby="login-error" @enderror type="text" value="{{ old('login') }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('login') border-red-500 @enderror">
+                        <input id="login" name="login" required aria-invalid="{{ $errors->has('login') ? 'true' : 'false' }}" @error('login') aria-describedby="login-error" @enderror type="text" value="{{ is_string(old('login')) ? old('login') : '' }}" autofocus autocomplete="username" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition duration-150 ease-in-out @error('login') border-red-500 @enderror">
 
                     </div>
                     @error('login')
