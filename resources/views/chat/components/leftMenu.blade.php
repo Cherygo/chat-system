@@ -1,45 +1,53 @@
-<div class="w-1/3 border-r border-gray-200 flex flex-col bg-gray-50">
+<div class="w-full md:w-1/3 min-w-0 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col bg-gray-50">
     <div class="p-4 border-b border-gray-200 bg-white">
         <div class="p-4 border-b border-gray-200 bg-white">
             <h2 class="text-lg font-bold text-gray-900 tracking-tight mb-3">Your Chats</h2>
 
             <div class="relative relative-search-container">
-                <input type="text" id="user-search" placeholder="Search for users..." autocomplete="off"
-                       class="w-full appearance-none border border-gray-300 rounded-full px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
-                <div id="search-results" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden overflow-hidden">
+                <label for="user-search" class="sr-only">Search for users</label>
+                <input type="text" id="user-search" data-search-url="{{ route('chat.search') }}" data-start-url="{{ url('/chat/start') }}" placeholder="Search for users..." autocomplete="off"
+                       class="w-full appearance-none border border-gray-300 rounded-full px-4 py-2 text-base sm:text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                <div id="search-results" aria-live="polite" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden overflow-hidden">
                 </div>
             </div>
-            <button id="openGroupModal" class="mt-5 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow-sm transition-colors cursor-pointer rounded-full">
+            <button type="button" id="openGroupModal" @disabled($users->isEmpty()) class="mt-5 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded shadow-sm transition-colors cursor-pointer rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
                 + New Group Chat
             </button>
 
-            <div id="groupModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+            <dialog id="groupModal" aria-labelledby="group-title" data-has-errors="{{ $errors->has('name') || $errors->has('user_ids') || $errors->has('user_ids.*') ? 'true' : 'false' }}" class="m-auto p-0 border-0 rounded-xl w-[calc(100%-2rem)] max-w-md backdrop:bg-gray-900/50">
 
                 <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-                    <h2 class="text-xl font-bold mb-4 text-gray-800">Create Group Chat</h2>
+                    <h2 id="group-title" class="text-xl font-bold mb-4 text-gray-800">Create Group Chat</h2>
 
+                    @if($errors->has('name') || $errors->has('user_ids') || $errors->has('user_ids.*'))
+                        <ul role="alert" class="mb-4 text-sm text-red-700">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
                     <form action="{{ route('chat.group')  }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Group Name</label>
-                            <input type="text" name="name" required placeholder="e.g. The Rocket League Squad"
+                            <label for="group-name" class="block text-sm font-medium text-gray-700 mb-1">Group Name</label>
+                            <input id="group-name" type="text" name="name" value="{{ is_string(old('name')) ? old('name') : '' }}" maxlength="255" required placeholder="e.g. The Rocket League Squad"
                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 px-3 py-2 border">
                         </div>
 
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Invite Users</label>
-                            <select name="user_ids[]" multiple required
+                            <label for="group-users" class="block text-sm font-medium text-gray-700 mb-1">Invite Users</label>
+                            <select id="group-users" name="user_ids[]" multiple required
                                     class="w-full border-gray-300 rounded-md shadow-sm h-32 focus:ring-teal-500 focus:border-teal-500 px-3 py-2 border">
 
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}">
+                                    <option value="{{ $user->id }}" @selected(in_array($user->id, (array) old('user_ids', [])))>
                                         {{ $user->username }}
                                     </option>
                                 @endforeach
 
                             </select>
-                            <p class="text-[10px] text-gray-500 mt-1">Hold Ctrl (or Cmd) to select multiple</p>
+                            <p class="text-sm text-gray-600 mt-1">Hold Ctrl (or Cmd) to select multiple</p>
                         </div>
 
                         <div class="flex justify-end gap-3 mt-6">
@@ -48,15 +56,15 @@
                         </div>
                     </form>
                 </div>
-            </div>
+            </dialog>
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto">
+    <div id="chat-list" class="flex-1 min-h-0 overflow-y-auto max-h-48 md:max-h-none">
         @forelse($chats as $chat)
-            <a href="{{ route('chat.show', $chat->id) }}" class="block p-4 border-b border-gray-100 hover:bg-gray-100 transition duration-150">
-                <div class="flex justify-between items-center mb-1" id="chat-list">
-                            <span class="font-semibold text-gray-900">
+            <a href="{{ route('chat.show', $chat->id) }}" data-chat-id="{{ $chat->id }}" class="block p-4 border-b border-gray-100 hover:bg-gray-100 transition duration-150">
+                <div class="flex justify-between items-center gap-2 mb-1">
+                            <span class="font-semibold text-gray-900 truncate">
                                 @if($chat->is_group)
                                     {{ $chat->name }}
                                 @else
@@ -64,7 +72,7 @@
                                 @endif
                             </span>
                     @if($chat->lastMessage)
-                        <span class="text-xs text-gray-400">
+                        <span class="text-xs text-gray-600">
                                     {{ $chat->lastMessage->created_at?->shortAbsoluteDiffForHumans() }}
                                 </span>
                     @endif
@@ -74,7 +82,7 @@
                 </p>
             </a>
         @empty
-            <div class="p-8 text-center text-gray-500 text-sm">
+            <div data-empty-chats class="p-8 text-center text-gray-500 text-sm">
                 You have no active chats.
             </div>
         @endforelse

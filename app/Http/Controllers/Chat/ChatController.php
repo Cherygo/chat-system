@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Events\ChatEvent;
+use App\Events\MessageEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Events\MessageEvent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ChatController extends Controller
 {
@@ -16,50 +18,53 @@ class ChatController extends Controller
         $user = auth()->user();
         $chats = $user?->chats()->with(['lastMessage', 'users'])->get();
         $users = User::where('id', '!=', auth()->id())->get();
+
         return view('chat.index', compact('chats', 'users'));
     }
 
     public function show($id)
     {
         $chat = Chat::with('messages.sender', 'users')->findOrFail($id);
-        if(!$chat->users->contains(auth()->id())) {
+        if (! $chat->users->contains(auth()->id())) {
             abort(403, 'Unauthorized access to chatroom');
         }
         $chats = auth()->user()->chats()->with(['lastMessage', 'users'])->get();
         $users = User::where('id', '!=', auth()->id())->get();
-        return view('chat.show', compact('chat','chats', 'users'));
+
+        return view('chat.show', compact('chat', 'chats', 'users'));
     }
 
     public function store(Request $request, $chatId)
     {
-        $validated = $request->validate([
-            'content' => 'required|string',
-        ]);
-
-        $chat = Chat::with('messages.sender')->findOrFail($chatId);
-        if(!$chat->users->contains(auth()->id())) {
+        $chat = Chat::with('users')->findOrFail($chatId);
+        if (! $chat->users->contains(auth()->id())) {
             abort(403, 'Unauthorized access to chatroom');
         }
 
+        $validated = $request->validate([
+            'content' => 'required|string|max:10000',
+        ]);
+
         $message = $chat->messages()->create([
-           'user_id' => auth()->id(),
-           'content' => $validated['content'],
+            'user_id' => auth()->id(),
+            'content' => $validated['content'],
         ]);
 
         $message->load('sender');
         MessageEvent::dispatch($message);
 
-        return back();
+        return redirect()->route('chat.show', $chat->id);
     }
 
     public function search(Request $request)
     {
-        $query = $request->input('query');
-        if(!$query) {
+        $validated = $request->validate(['query' => 'nullable|string|max:255']);
+        $query = $validated['query'] ?? null;
+        if (! $query) {
             return response()->json([]);
         }
 
-        $users = User::where('username', 'ILIKE', "%{$query}%" )
+        $users = User::whereLike('username', "%{$query}%")
             ->where('id', '!=', auth()->id())
             ->limit(5)
             ->get(['id', 'username']);
@@ -69,19 +74,29 @@ class ChatController extends Controller
 
     public function startChat(User $user)
     {
-        $chat = auth()->user()->chats()
-            ->where('is_group', false)
-            ->whereHas('users', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
-            })->first();
+        $currentUserId = auth()->id();
+        abort_if($user->id === $currentUserId, 422, 'Choose another user to start a chat.');
 
-        if(!$chat) {
-            $chat = Chat::create([
-               'is_group' => false,
-               'name' => null,
-            ]);
+        [$chat, $created] = DB::transaction(function () use ($user, $currentUserId) {
+            // Lock both participants in a stable order so simultaneous requests reuse one chat.
+            User::whereKey([$currentUserId, $user->id])->orderBy('id')->lockForUpdate()->get();
+            $chat = Chat::where('is_group', false)->has('users', '=', 2)
+                ->whereHas('users', fn ($query) => $query->where('users.id', $currentUserId))
+                ->whereHas('users', fn ($query) => $query->where('users.id', $user->id))
+                ->first();
 
-            $chat->users()->attach([auth()->id(), $user->id]);
+            if ($chat) {
+                return [$chat, false];
+            }
+
+            $chat = Chat::create(['is_group' => false, 'name' => null]);
+            $chat->users()->attach([$currentUserId, $user->id]);
+
+            return [$chat, true];
+        });
+
+        if ($created) {
+            ChatEvent::dispatch($chat, $currentUserId);
         }
 
         return redirect()->route('chat.show', $chat->id);
@@ -89,20 +104,21 @@ class ChatController extends Controller
 
     public function storeGroup(Request $request)
     {
-//        dd($request->all());
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'user_ids' => 'required|array|min:1',
-            'user_ids.*' => 'exists:users,id',
+            'user_ids.*' => ['required', 'integer', 'distinct', 'exists:users,id', Rule::notIn([auth()->id()])],
         ]);
-        $chat = Chat::create([
-            'name' => $validated['name'],
-            'is_group' => true,
-        ]);
-        $userIds = array_merge($validated['user_ids'], [auth()->id()]);
+        $chat = DB::transaction(function () use ($validated) {
+            $chat = Chat::create([
+                'name' => $validated['name'],
+                'is_group' => true,
+            ]);
+            $chat->users()->attach(array_merge($validated['user_ids'], [auth()->id()]));
 
-        $chat->users()->attach($userIds);
-        event(new ChatEvent($chat));
+            return $chat;
+        });
+        ChatEvent::dispatch($chat, auth()->id());
 
         return redirect()->route('chat.show', $chat->id);
     }

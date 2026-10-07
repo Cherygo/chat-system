@@ -89,6 +89,7 @@ class AuthenticationTest extends TestCase
         $this->from(route('login'))->post(route('login.user'), [
             'login' => ['invalid'], 'password' => 'password',
         ])->assertRedirect(route('login'))->assertSessionHasErrors('login');
-        $this->get(route('login'))->assertOk();
+        $this->withCookie(session()->getName(), session()->getId())->get(route('login'))
+            ->assertOk()->assertSee('The login field must be a string.');
     }
 }
